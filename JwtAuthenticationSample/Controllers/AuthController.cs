@@ -29,12 +29,20 @@ public class AuthController : ControllerBase
 
         var user = await _dbContext.Users
             .SingleOrDefaultAsync(d => d.Email == request.Email);
+
         if (user == null)
         {
             return BadRequest("Bad credentials");
         }
 
+        // Add Requested Scopes for easier tests:
+        if(request.RequestedScopes != null)
+        {
+            user.Scopes = request.RequestedScopes;
+        }
+        
         var isPasswordValid = user.Password == request.Password;
+
         if (!isPasswordValid)
         {
             return BadRequest("Bad credentials");
@@ -58,12 +66,16 @@ public class AuthController : ControllerBase
 
         [MinLength(6), Required] 
         public string Password { get; set; } = null!;
+
+        public string RequestedScopes { get; set; }
     }
     
     public class LoginResponseDto
     {
         public string Username { get; set; }
+
         public string Email { get; set; }
+
         public string Token { get; set; }
     }
 }
