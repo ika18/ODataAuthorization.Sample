@@ -39,23 +39,41 @@ $authHeader = @{
 
 # OData Query 1: All Products
 $allProductsResponse = Invoke-RestMethod -Uri "http://localhost:5124/odata/Products" -Headers $authHeader 
+$allProductsResponseValue = $allProductsResponse.value | ConvertTo-Json
 
-Write-Host "===================================================================================="
-Write-Host "OData Query #1: http://localhost:5124/odata/Products"
-Write-Host $allProductsResponse.value | ConvertTo-Json
-Write-Host " "
-Write-Host "===================================================================================="
-Write-Host " "
-Write-Host "===================================================================================="
-Write-Host "OData Query #2: http://localhost:5124/odata/Products(`$expand=Address)"
+
+Write-Host "[REQ]"
+Write-Host "[REQ] OData Request #1"
+Write-Host "[REQ]     URL:            http://localhost:5124/odata/Products"
+Write-Host "[REQ]     Scopes:         Products.Read Products.ReadByKey"
+Write-Host "[REQ]"
+
+try {
+    $allProductsResponse = Invoke-RestMethod -Uri "http://localhost:5124/odata/Products" -Headers $authHeader 
+    $allProductsResponseValue = $allProductsResponse.value | ConvertTo-Json
+    
+    Write-Host "[RES]    HTTP Status:    $statusCode"  -ForegroundColor Green
+    Write-Host "[RES]    Body:           $allProductsResponseValue"  -ForegroundColor Green
+} catch {
+    Write-Host "[RES] Request failed with StatusCode:" $_.Exception.Response.StatusCode.value__ -ForegroundColor Red
+}
+
+Write-Host "[REQ]"
+Write-Host "[REQ] OData Request #2"
+Write-Host "[REQ]     URL:            http://localhost:5124/odata/Products(`$expand=Address)"
+Write-Host "[REQ]     Scopes:         Products.Read Products.ReadByKey"
+Write-Host "[REQ]"
+
 try {
     # OData Query 1: All Products
     $customersWithAddressResponse = Invoke-RestMethod -Uri "http://localhost:5124/odata/Products?`$expand=Address" -Headers $authHeader 
+    $customersWithAddressResponseValue = $customersWithAddressResponse.value | ConvertTo-Json
+    
+    Write-Host "[RES]    HTTP Status:    $statusCode"  -ForegroundColor Green
+    Write-Host "[RES]    Body:           $allProductsResponseValue"  -ForegroundColor Green
 } catch {
-    Write-Host "Request failed with StatusCode:" $_.Exception.Response.StatusCode.value__ 
+    Write-Host "[RES] Request failed with StatusCode:" $_.Exception.Response.StatusCode.value__ -ForegroundColor Red
 }
-Write-Host "===================================================================================="
-Write-Host " "
 
 # Perform /Auth/login with additional Products.ReadAddress Scope
 $authRequestBody = @{
@@ -82,9 +100,19 @@ $authHeader = @{
     Authorization = "Bearer $authToken"
 }
 
-Write-Host "===================================================================================="
-Write-Host "OData Query #3: http://localhost:5124/odata/Products(`$expand=Address)"
-$customersWithAddressResponse = Invoke-RestMethod -Uri "http://localhost:5124/odata/Products?`$expand=Address" -Headers $authHeader 
-Write-Host $customersWithAddressResponse.value | ConvertTo-Json
-Write-Host "===================================================================================="
-Write-Host " "
+Write-Host "[REQ]"
+Write-Host "[REQ] OData Request #3"
+Write-Host "[REQ]     URL:            http://localhost:5124/odata/Products(`$expand=Address)"
+Write-Host "[REQ]     Scopes:         Products.Read Products.ReadByKey Products.ReadAddress" 
+Write-Host "[REQ]" -ForegroundColor Green
+
+try {
+    # OData Query 1: All Products
+    $customersWithAddressResponse = Invoke-RestMethod -Uri "http://localhost:5124/odata/Products?`$expand=Address" -Headers $authHeader 
+    $customersWithAddressResponseValue = $customersWithAddressResponse.value | ConvertTo-Json
+    
+    Write-Host "[RES]    HTTP Status:    $statusCode"  -ForegroundColor Green
+    Write-Host "[RES]    Body:           $allProductsResponseValue"  -ForegroundColor Green
+} catch {
+    Write-Host "[RES] Request failed with StatusCode:" $_.Exception.Response.StatusCode.value__ -ForegroundColor Red 
+}
