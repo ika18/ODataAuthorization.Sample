@@ -57,7 +57,7 @@ try {
 Write-Host "===================================================================================="
 Write-Host " "
 
-# Perform /Auth/login to obtain the JWT with Requested Scopes
+# Perform /Auth/login with additional Products.ReadAddress Scope
 $authRequestBody = @{
     Email = "admin@admin.com"
     Password = "123456"
@@ -82,10 +82,9 @@ $authHeader = @{
     Authorization = "Bearer $authToken"
 }
 
-Write-Host "OData Query #2: http://localhost:5124/odata/Products(`$expand=Address)"
+Write-Host "===================================================================================="
+Write-Host "OData Query #3: http://localhost:5124/odata/Products(`$expand=Address)"
 $customersWithAddressResponse = Invoke-RestMethod -Uri "http://localhost:5124/odata/Products?`$expand=Address" -Headers $authHeader 
-
 Write-Host $customersWithAddressResponse.value | ConvertTo-Json
-
 Write-Host "===================================================================================="
 Write-Host " "
