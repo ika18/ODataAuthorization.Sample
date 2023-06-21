@@ -83,7 +83,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline.IScopesEvaluator
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -98,8 +98,6 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.UseODataAuthorization();
 
 app.MapControllers();
 

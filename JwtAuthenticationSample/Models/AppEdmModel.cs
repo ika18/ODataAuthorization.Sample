@@ -1,4 +1,5 @@
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.ModelBuilder;
 
 namespace JwtAuthenticationSample.Models;
@@ -8,6 +9,7 @@ public class AppEdmModel
     public static IEdmModel GetModel()
     {
         var builder = new ODataConventionModelBuilder();
+
         var products = builder.EntitySet<Product>("Products");
         var addresses = builder.EntitySet<Address>("Addresses");
 
@@ -28,9 +30,13 @@ public class AppEdmModel
 
 
         // TODO: I want to add a permission to control expand address from product
-        // products.HasExpandRestrictions();
-        
-        
+        products.HasNavigationRestrictions()
+                      .HasRestrictedProperties(props => props
+                          .HasNavigationProperty(new EdmNavigationPropertyPathExpression("Products/Address"))
+                          .HasReadRestrictions(r => r
+                              .HasPermissions(p => p.HasSchemeName("Scheme").HasScopes(s => s.HasScope("Products.ReadAddress")))));
+
+
         return builder.GetEdmModel();
     }
 }
